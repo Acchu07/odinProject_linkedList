@@ -1,5 +1,7 @@
-class Node{
-    constructor(data,next,previous){
+class Node
+{
+    constructor(data, next, previous)
+    {
         this.data = data;
         this.next = null;
         this.previous = null;
@@ -7,71 +9,147 @@ class Node{
 }
 
 
-class LinkedList{
-    
-    static listNodeAppend(nodeObject,nodeObjectAdd){ // need to modify so multiple body nodes can be passed and appended in a sequence
-        nodeObject.next = nodeObjectAdd;
-        nodeObjectAdd.previous = nodeObject;
+class LinkedList
+{
+
+    constructor(node)
+    {
+        this.head = node;
+        this.tail = node;
     }
 
-    static listNodePrepend(nodeObjectNewHead,nodeObjectCurrentHead){
-        nodeObjectNewHead.next = nodeObjectCurrentHead;
+    listNodeAppend(nodeObjectAdd)
+    { // need to modify so multiple body nodes can be passed and appended in a sequence - might be complicating this a bit
+        if (this.head.next === null)
+        {
+            this.head.next = nodeObjectAdd;
+            nodeObjectAdd.previous = this.head;
+            this.tail = nodeObjectAdd;
+            return;
+        }
+        this.tail.next = nodeObjectAdd;
+        nodeObjectAdd.previous = this.tail;
+        this.tail = nodeObjectAdd;
     }
 
-    static findSize(nodeObject){
-        if(nodeObject.next === null){
+    listNodePrepend(nodeObjectNewHead)
+    {
+        this.head.prev = nodeObjectNewHead;
+        nodeObjectNewHead.next = this.head;
+        this.head = nodeObjectNewHead;
+    }
+
+    findSize()
+    {
+        if (this.head.next === null)
+        {
             return 1;
         }
         let size = 1;
-        while(nodeObject.next !== null){
-            nodeObject = nodeObject.next;
+        let traverseObject = this.head;
+        while (traverseObject.next !== null)
+        {
+            traverseObject = traverseObject.next;
             size++;
         }
         return size;
     }
 
-    static findHead(nodeObject){
-        if(nodeObject.previous === null){
-            return nodeObject;
+    static findSizeInternal(nodeObject)
+    {
+        if (nodeObject.next === null)
+        {
+            return 1;
         }
-        while(nodeObject.previous !== null){
-            nodeObject = nodeObject.previous;
-        }
-        return nodeObject;
-    }
-
-    static findTail(nodeObject){
-        if(nodeObject.next === null){
-            return nodeObject;
-        }
-        while(nodeObject.next !== null){
+        let size = 1;
+        while (nodeObject.next !== null)
+        {
             nodeObject = nodeObject.next;
+            size++;
         }
-        return nodeObject;
-    }
-    
-    static findNodeAtIndex(indexValue, nodeObject){ // could be made better - if indexValue close to size then search from tail if close to head search from head
-        let nodeObjectTraverse;
-        if(nodeObject.previous !== null){
-            nodeObjectTraverse = LinkedList.findHead(nodeObject)
-        }
-        else{
-            nodeObjectTraverse = nodeObject;
-        }
+        return size;
 
-        if(LinkedList.findSize(nodeObjectTraverse) < indexValue){
+
+    }
+
+    findHead(nodeObject)
+    {
+        return this.head;
+    }
+
+    findTail(nodeObject)
+    {
+        return this.tail;
+    }
+
+    findNodeAtIndex(indexValue)
+    { // could be made better - if indexValue close to size then search from tail if close to head search from head
+        let nodeObjectTraverse = this.head;
+        const checkSize = LinkedList.findSizeInternal(nodeObjectTraverse);
+        if (checkSize < indexValue)
+        {
             console.log('Cannot search index value greater than size')
-            return;
+            return 'Invalid Index';
         }
         let startSearchIndex = 1;
-        while(startSearchIndex !== indexValue){
+        while (startSearchIndex !== indexValue)
+        {
             nodeObjectTraverse = nodeObjectTraverse.next;
             startSearchIndex++;
         }
         return nodeObjectTraverse;
     }
 
-    static pop(){
+    pop()
+    {
+        this.tail.previous.next = null;
+        this.tail = this.tail.previous;
+    }
+    
+    contains(valueToSearch){
+        let nodeObjectTraverse = this.head;
+        while(nodeObjectTraverse.next !== null){
+            if(valueToSearch === nodeObjectTraverse.data){
+                return true;
+            }
+            nodeObjectTraverse = nodeObjectTraverse.next;
+        }
+        
+        if(valueToSearch === nodeObjectTraverse.data){
+            return true;
+        }
+        return false;
+    }
+
+    find(valueToSearch){
+        let nodeObjectTraverse = this.head;
+        let index = 1;
+        while(nodeObjectTraverse.next !== null){
+            if(valueToSearch === nodeObjectTraverse.data){
+                return index;
+            }
+            nodeObjectTraverse = nodeObjectTraverse.next;
+            index++;
+        }
+
+        if(valueToSearch === nodeObjectTraverse.data){
+            return index;
+        }
+
+        return null;
+    }
+
+    toString(){
+        let stringOfValues = '';
+        let nodeObjectTraverse = this.head;
+        let index = 1;
+        while(nodeObjectTraverse.next !== null){
+            let stringValue = `(${nodeObjectTraverse.data}) -> `
+            stringOfValues += stringValue;
+            nodeObjectTraverse = nodeObjectTraverse.next;
+        }
+        stringOfValues = stringOfValues.concat('',`(${nodeObjectTraverse.data})`)
+        return stringOfValues;
 
     }
 
@@ -80,15 +158,14 @@ class LinkedList{
 
 const nodeHead = new Node('Node 1');
 const nodeBody1 = new Node('Node 2');
-const nodeBody2 = new Node('Node 3');
 
-// console.log(nodeHead);
 
-LinkedList.listNodeAppend(nodeHead, nodeBody1);
-LinkedList.listNodeAppend(nodeBody1, nodeBody2); 
+const linkedList1 = new LinkedList(nodeHead);
 
-// console.log(nodeHead);
-console.log(LinkedList.findSize(nodeHead));
-// console.log(LinkedList.findHead(nodeBody1));
-// console.log(LinkedList.findTail(nodeHead));
-console.log(LinkedList.findNodeAtIndex(3,nodeBody2));
+linkedList1.listNodeAppend(nodeBody1);
+linkedList1.listNodeAppend(new Node('Node 3'));
+linkedList1.listNodeAppend(new Node('Node 4'));
+
+linkedList1.listNodePrepend(new Node('Node 0'))
+linkedList1.pop()
+console.log(linkedList1.toString())
