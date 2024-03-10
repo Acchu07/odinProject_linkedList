@@ -2,6 +2,7 @@ class Node{
     constructor(data,next){
         this.data = data;
         this.next = null;
+        this.previous = null;
     }
 }
 
@@ -10,6 +11,7 @@ class LinkedList{
     
     static append(nodeObject,nodeObjectAdd){
         nodeObject.next = nodeObjectAdd;
+        nodeObjectAdd.previous = nodeObject;
     }
 
     static prepend(nodeObjectNewHead,nodeObjectCurrentHead){
